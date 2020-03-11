@@ -566,7 +566,7 @@ MyStackViewPage {
         var profiles = [""]
         var profileCount = DeviceManipulationTabController.getDeviceManipulationProfileCount()
         for (var i = 0; i < profileCount; i++) {
-            profiles.push(DeviceManipulationTabController.getDeviceManipulationProfileName(i))
+            profiles.push(DeviceManipulationTabController.getDeviceManipulationProfileName(i) + " - " + DeviceManipulationTabController.getDeviceManipulationProfileSerial(i))
         }
         deviceManipulationProfileComboBox.model = profiles
         deviceManipulationProfileComboBox.currentIndex = 0

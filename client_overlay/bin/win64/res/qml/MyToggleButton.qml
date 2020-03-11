@@ -14,15 +14,13 @@ CheckBox {
 		y: parent.height / 2 - height / 2
 		color: parent.enabled ? (parent.down ? "#e0e0e0" : "#ffffff") : "#a0a0a0"
 		border.width: 0
-		Image {
-			width: 38
-			height: 38
-			x: (parent.width - width) / 2
-			y: (parent.height - height) / 2
-			source: "image://default/check/#2c435d"
-			sourceSize.width: width
-			sourceSize.height: height
+		Rectangle {
 			visible: parent.parent.checked
+			color: "#555"
+			border.color: "#333"
+			radius: 1
+			anchors.margins: 4
+			anchors.fill: parent
 		}
 	}
 

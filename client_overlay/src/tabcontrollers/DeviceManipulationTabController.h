@@ -32,6 +32,7 @@ struct AnalogInputRemappingProfile {
 
 struct DeviceManipulationProfile {
 	std::string profileName;
+	std::string deviceSerial;
 
 	bool includesDeviceOffsets = false;
 	bool deviceOffsetsEnabled = false;
@@ -118,12 +119,14 @@ public:
 	Q_INVOKABLE unsigned getMotionCompensationMovingAverageWindow();
 
 	void reloadDeviceManipulationSettings();
+	void autoApplyDeviceSettings();
 	void reloadDeviceManipulationProfiles();
 	void saveDeviceManipulationSettings();
 	void saveDeviceManipulationProfiles();
 
 	Q_INVOKABLE unsigned getDeviceManipulationProfileCount();
 	Q_INVOKABLE QString getDeviceManipulationProfileName(unsigned index);
+	Q_INVOKABLE QString getDeviceManipulationProfileSerial(unsigned index);
 
 	Q_INVOKABLE unsigned getRenderModelCount();
 	Q_INVOKABLE QString getRenderModelName(unsigned index);

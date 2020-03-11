@@ -125,6 +125,7 @@ void DeviceManipulationTabController::eventLoopTick(vr::TrackedDevicePose_t* dev
 			}
 			if (newDeviceAdded) {
 				emit deviceCountChanged((unsigned)deviceInfos.size());
+				autoApplyDeviceSettings();
 			}
 		}
 	} else {
@@ -293,6 +294,26 @@ void DeviceManipulationTabController::reloadDeviceManipulationSettings() {
 	settings->endGroup();
 }
 
+void DeviceManipulationTabController::autoApplyDeviceSettings()
+{
+	for (int index = 0; index < getDeviceCount(); index++)
+	{
+		auto deviceSerial = getDeviceSerial(index);
+		if (deviceSerial == "<ERROR>")
+		{
+			continue;
+		}
+		for (int i = 0; i < deviceManipulationProfiles.size(); i++)
+		{
+			auto& setting = deviceManipulationProfiles[i];
+			if (setting.deviceSerial == deviceSerial.toStdString())
+			{
+				applyDeviceManipulationProfile(i, index);
+			}
+		}
+	}
+}
+
 void DeviceManipulationTabController::reloadDeviceManipulationProfiles() {
 	deviceManipulationProfiles.clear();
 	auto settings = OverlayController::appSettings();
@@ -303,6 +324,7 @@ void DeviceManipulationTabController::reloadDeviceManipulationProfiles() {
 		deviceManipulationProfiles.emplace_back();
 		auto& entry = deviceManipulationProfiles[i];
 		entry.profileName = settings->value("profileName").toString().toStdString();
+		entry.deviceSerial = settings->value("deviceSerial").toString().toStdString();
 		entry.includesDeviceOffsets = settings->value("includesDeviceOffsets", false).toBool();
 		if (entry.includesDeviceOffsets) {
 			entry.deviceOffsetsEnabled = settings->value("deviceOffsetsEnabled", false).toBool();
@@ -448,6 +470,7 @@ void DeviceManipulationTabController::saveDeviceManipulationProfiles() {
 	for (auto& p : deviceManipulationProfiles) {
 		settings->setArrayIndex(i);
 		settings->setValue("profileName", QString::fromStdString(p.profileName));
+		settings->setValue("deviceSerial", QString::fromStdString(p.deviceSerial));
 		settings->setValue("includesDeviceOffsets", p.includesDeviceOffsets);
 		if (p.includesDeviceOffsets) {
 			settings->setValue("deviceOffsetsEnabled", p.deviceOffsetsEnabled);
@@ -523,6 +546,15 @@ QString DeviceManipulationTabController::getDeviceManipulationProfileName(unsign
 	}
 }
 
+QString DeviceManipulationTabController::getDeviceManipulationProfileSerial(unsigned index) {
+	if (index >= deviceManipulationProfiles.size()) {
+		return QString();
+	}
+	else {
+		return QString::fromStdString(deviceManipulationProfiles[index].deviceSerial);
+	}
+}
+
 void DeviceManipulationTabController::addDeviceManipulationProfile(QString name, unsigned deviceIndex, bool includesDeviceOffsets, bool includesInputRemapping) {
 	if (deviceIndex >= deviceInfos.size()) {
 		return;
@@ -541,6 +573,7 @@ void DeviceManipulationTabController::addDeviceManipulationProfile(QString name,
 		profile = &deviceManipulationProfiles[i];
 	}
 	profile->profileName = name.toStdString();
+	profile->deviceSerial = getDeviceSerial(deviceIndex).toStdString();
 	profile->includesDeviceOffsets = includesDeviceOffsets;
 	if (includesDeviceOffsets) {
 		profile->deviceOffsetsEnabled = device->deviceOffsetsEnabled;
